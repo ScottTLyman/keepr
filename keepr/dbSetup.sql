@@ -6,3 +6,37 @@ CREATE TABLE IF NOT EXISTS accounts(
   email varchar(255) COMMENT 'User Email',
   picture varchar(255) COMMENT 'User Picture'
 ) default charset utf8 COMMENT '';
+CREATE TABLE IF NOT EXISTS keeps(
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'Primary Key',
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Time Created',
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Last Update',
+  name TEXT COMMENT 'Keep Name',
+  description TEXT COMMENT 'Keep Description',
+  img TEXT COMMENT 'Keep ImgUrl',
+  views INT COMMENT 'Keep Views',
+  kept INT COMMENT 'Keep Kept',
+  creatorId VARCHAR(255) NOT NULL,
+  FOREIGN KEY (creatorId) REFERENCES accounts(id) ON DELETE CASCADE
+) default charset utf8 COMMENT '';
+CREATE TABLE IF NOT EXISTS vaults(
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'Primary Key',
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Time Created',
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Last Update',
+  name TEXT COMMENT 'Vault Name',
+  description TEXT COMMENT 'Vault Description',
+  img TEXT COMMENT 'Vault ImgUrl',
+  isPrivate BIT COMMENT 'Vault Privacy',
+  creatorId VARCHAR(255) NOT NULL,
+  FOREIGN KEY (creatorId) REFERENCES accounts(id) ON DELETE CASCADE
+) default charset utf8 COMMENT '';
+CREATE TABLE IF NOT EXISTS vaultKeeps(
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT 'Primary Key',
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Time Created',
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Last Update',
+  vaultId INT NOT NULL,
+  keepId INT NOT NULL,
+  creatorId VARCHAR(255) NOT NULL,
+  FOREIGN KEY (vaultId) REFERENCES vaults(id) ON DELETE CASCADE,
+  FOREIGN KEY (keepId) REFERENCES keeps(id) ON DELETE CASCADE,
+  FOREIGN KEY (creatorId) REFERENCES accounts(id) ON DELETE CASCADE
+) default charset utf8 COMMENT '';;
