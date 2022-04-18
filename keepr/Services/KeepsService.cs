@@ -28,7 +28,9 @@ namespace keepr.Services
     }
     internal Keep GetById(int id)
     {
-      return _repo.GetById(id);
+      Keep keep = _repo.GetById(id);
+      keep.Views++;
+      return keep;
     }
 
     internal Keep Update(Keep data)
@@ -38,6 +40,15 @@ namespace keepr.Services
       original.Name = data.Name ?? original.Name;
       original.Description = data.Description ?? original.Description;
       original.Img = data.Img ?? original.Img;
+      original.Kept = data.Kept;
+      _repo.Update(original);
+      return original;
+    }
+    private Keep UpdateKept(Keep data)
+    {
+      Keep original = GetById(data.Id);
+      ValidateOwner(data.CreatorId, original);
+      original.Kept = data.Kept;
       _repo.Update(original);
       return original;
 

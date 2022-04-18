@@ -38,18 +38,12 @@ namespace keepr.Controllers
     }
     [HttpGet("vaults")]
     [Authorize]
-    public ActionResult<List<Vault>> GetMyVaults(string id)
-    // public async Task<ActionResult<List<Vault>>> GetMyVaults(string id)
+    public async Task<ActionResult<List<Vault>>> GetMyVaults()
     {
       try
       {
-        // Account userInfo = await HttpContext.GetUserInfoAsync<Account>();
-        // if (userInfo.Id != id)
-        // {
-        //   throw new Exception("Not your account");
-        // }
-        List<Vault> vaults = _vs.GetMyVaults(id);
-        return Ok(vaults);
+        Account userInfo = await HttpContext.GetUserInfoAsync<Account>();
+        return Ok(_vs.GetMyVaults(userInfo.Id));
 
       }
       catch (Exception e)

@@ -121,6 +121,21 @@ namespace keepr.Repositories
       }
       throw new Exception("SQL error on update keeps, no rows affected");
     }
+    internal Keep UpdateKept(Keep update)
+    {
+      string sql = @"
+      UPDATE keeps
+      SET
+        kept = @Kept
+      WHERE id = @id;
+      ";
+      int rows = _db.Execute(sql, update);
+      if (rows > 0)
+      {
+        return update;
+      }
+      throw new Exception("SQL error on update keeps, no rows affected");
+    }
     public void Remove(int id)
     {
       string sql = "DELETE FROM keeps WHERE id = @id LIMIT 1;";

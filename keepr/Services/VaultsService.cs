@@ -32,9 +32,9 @@ namespace keepr.Services
     {
       return _repo.GetProfileVaults(id);
     }
-    internal List<Vault> GetMyVaults(string id)
+    internal List<Vault> GetMyVaults(string userId)
     {
-      return _repo.GetMyVaults(id);
+      return _repo.GetMyVaults(userId);
     }
     internal Vault Update(Vault data)
     {
