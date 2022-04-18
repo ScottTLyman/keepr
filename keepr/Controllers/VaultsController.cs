@@ -28,6 +28,10 @@ namespace keepr.Controllers
       try
       {
         Profile userInfo = await HttpContext.GetUserInfoAsync<Profile>();
+        if (userInfo == null)
+        {
+          throw new Exception("You must log in to create a Vault");
+        }
         data.CreatorId = userInfo.Id;
         Vault vault = _vs.Create(data);
         data.Creator = userInfo;
@@ -74,16 +78,16 @@ namespace keepr.Controllers
       }
     }
     [HttpGet("{id}/keeps")]
-    public ActionResult<List<Keep>> GetVaultKeeps(int id)
+    public async Task<ActionResult<List<KeepViewModel>>> GetVaultKeeps(int id)
     {
       try
       {
-        // Vault found = await GetById(id);
-
-        List<Keep> keeps = _ks.GetVaultKeeps(id);
-        return Ok(keeps);
-
-
+        Profile userInfo = await HttpContext.GetUserInfoAsync<Profile>();
+        if (userInfo == null)
+        {
+          return _ks.GetVaultKeeps(id);
+        }
+        return _ks.GetVaultKeeps(id, userInfo.Id);
       }
       catch (Exception e)
       {

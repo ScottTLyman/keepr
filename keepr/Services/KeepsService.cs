@@ -2,17 +2,21 @@ using System;
 using System.Collections.Generic;
 using keepr.Models;
 using keepr.Repositories;
+using Microsoft.AspNetCore.Mvc;
 
 namespace keepr.Services
 {
   public class KeepsService
   {
     private readonly KeepsRepository _repo;
+    private readonly VaultsRepository _vrepo;
 
-    public KeepsService(KeepsRepository repo)
+    public KeepsService(KeepsRepository repo, VaultsRepository vrepo)
     {
       _repo = repo;
+      _vrepo = vrepo;
     }
+
     internal Keep Create(Keep data)
     {
       return _repo.Create(data);
@@ -44,17 +48,52 @@ namespace keepr.Services
       ValidateOwner(userId, original);
       _repo.Remove(id);
     }
+
+
     private static void ValidateOwner(string userId, Keep data)
     {
       if (userId != data.CreatorId)
       {
-        throw new Exception("You cannot edit someone else's Keep!");
+        throw new Exception("Not your data!");
       }
     }
 
-    internal List<Keep> GetVaultKeeps(int vaultId)
+    internal List<Keep> GetProfileKeeps(string id)
     {
-      return _repo.GetVaultKeeps(vaultId);
+      return _repo.GetProfileKeeps(id);
+    }
+
+
+    internal ActionResult<List<KeepViewModel>> GetVaultKeeps(int id, string userId)
+    {
+      Vault found = _vrepo.GetById(id);
+      if (found != null)
+      {
+        if (found.IsPrivate == true)
+        {
+          if (found.CreatorId == userId)
+          {
+            return _repo.GetVaultKeeps(id);
+          }
+          throw new Exception("Invalid vault");
+        }
+        return _repo.GetVaultKeeps(id);
+      }
+      throw new Exception("Invalid Id");
+    }
+
+    internal ActionResult<List<KeepViewModel>> GetVaultKeeps(int id)
+    {
+      Vault found = _vrepo.GetById(id);
+      if (found != null)
+      {
+        if (found.IsPrivate == true)
+        {
+          throw new Exception("Invalid vault");
+        }
+        return _repo.GetVaultKeeps(id);
+      }
+      throw new Exception("Invalid Id");
     }
   }
 }

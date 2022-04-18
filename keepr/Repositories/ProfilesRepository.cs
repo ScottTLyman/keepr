@@ -1,5 +1,4 @@
 using System.Data;
-using System.Linq;
 using Dapper;
 using keepr.Models;
 
@@ -22,11 +21,7 @@ namespace keepr.Repositories
         FROM accounts a
         WHERE a.id = @id
       ";
-      return _db.Query<Profile, Profile, Profile>(sql, (profile, user) =>
-      {
-        profile.Id = user.Id;
-        return profile;
-      }).FirstOrDefault();
+      return _db.QueryFirstOrDefault<Profile>(sql, new { id });
     }
   }
 }

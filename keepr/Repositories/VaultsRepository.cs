@@ -63,7 +63,41 @@ namespace keepr.Repositories
         return vault;
       }, new { id }).FirstOrDefault();
     }
-
+    internal List<Vault> GetProfileVaults(string id)
+    {
+      string sql = @"
+      SELECT
+        v.*,
+        a.*
+        FROM vaults v
+        JOIN accounts a
+        ON v.creatorId = a.id
+        WHERE v.creatorId = @id
+        AND v.isPrivate = 0;
+      ";
+      return _db.Query<Vault, Profile, Vault>(sql, (v, prof) =>
+      {
+        v.Creator = prof;
+        return v;
+      }, new { id }).ToList();
+    }
+    internal List<Vault> GetMyVaults(string id)
+    {
+      string sql = @"
+      SELECT
+        v.*,
+        a.*
+        FROM vaults v
+        JOIN accounts a
+        ON v.creatorId = a.id
+        WHERE v.creatorId = @id;
+      ";
+      return _db.Query<Vault, Profile, Vault>(sql, (v, prof) =>
+      {
+        v.Creator = prof;
+        return v;
+      }, new { id }).ToList();
+    }
 
     internal Vault Update(Vault original)
     {

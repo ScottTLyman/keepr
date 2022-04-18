@@ -28,7 +28,14 @@ namespace keepr.Services
     {
       return _repo.GetById(id);
     }
-
+    internal List<Vault> GetProfileVaults(string id)
+    {
+      return _repo.GetProfileVaults(id);
+    }
+    internal List<Vault> GetMyVaults(string id)
+    {
+      return _repo.GetMyVaults(id);
+    }
     internal Vault Update(Vault data)
     {
       Vault original = GetById(data.Id);
@@ -46,11 +53,13 @@ namespace keepr.Services
       ValidateOwner(userId, original);
       _repo.Remove(id);
     }
+
+
     private static void ValidateOwner(string userId, Vault data)
     {
       if (userId != data.CreatorId)
       {
-        throw new Exception("You cannot edit someone else's Vault!");
+        throw new Exception("Not your data!");
       }
     }
   }

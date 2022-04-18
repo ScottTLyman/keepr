@@ -65,20 +65,44 @@ namespace keepr.Repositories
       }, new { id }).FirstOrDefault();
     }
 
-    internal List<Keep> GetVaultKeeps(int vaultId)
+    internal List<KeepViewModel> GetVaultKeeps(int vaultId)
     {
-      throw new NotImplementedException();
-      //   string sql = @"
-      //   SELECT
-      //     k.*,
-      //     vk.*,
-      //     v.*
-      //     FROM keeps k
-      //     JOIN vaults v ON 
-      //     WHERE 
-      //   ";
-      //   return _db.Query;
+      string sql = @"
+        SELECT
+          vk.*,
+          k.*,
+          a.*
+          FROM vaultKeeps vk
+          JOIN keeps k ON vk.keepId = k.id
+          JOIN accounts a ON k.creatorId = a.id
+          WHERE vk.vaultId = @vaultId;
+        ";
+      return _db.Query<VaultKeep, KeepViewModel, Profile, KeepViewModel>(sql, (vk, k, prof) =>
+      {
+        k.VaultKeepId = vk.Id;
+        k.Creator = prof;
+        return k;
+      }, new { vaultId }).ToList();
     }
+
+    internal List<Keep> GetProfileKeeps(string id)
+    {
+      string sql = @"
+      SELECT
+        k.*,
+        a.*
+        FROM keeps k
+        JOIN accounts a
+        ON k.creatorId = a.id
+        WHERE k.creatorId = @id;
+      ";
+      return _db.Query<Keep, Profile, Keep>(sql, (k, prof) =>
+      {
+        k.Creator = prof;
+        return k;
+      }, new { id }).ToList();
+    }
+
 
     public Keep Update(Keep original)
     {

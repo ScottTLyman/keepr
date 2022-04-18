@@ -12,6 +12,11 @@ namespace keepr.Repositories
     {
       _db = db;
     }
+    internal VaultKeep GetById(int id)
+    {
+      string sql = "SELECT * FROM vaultKeeps WHERE id = @id;";
+      return _db.QueryFirstOrDefault<VaultKeep>(sql, new { id });
+    }
 
     internal VaultKeep Create(VaultKeep data)
     {
@@ -25,6 +30,12 @@ namespace keepr.Repositories
       int id = _db.ExecuteScalar<int>(sql, data);
       data.Id = id;
       return data;
+    }
+
+    internal void Delete(int id)
+    {
+      string sql = "DELETE FROM vaultKeeps WHERE id = @id LIMIT 1;";
+      _db.Execute(sql, new { id });
     }
   }
 }
