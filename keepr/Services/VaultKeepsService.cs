@@ -38,7 +38,7 @@ namespace keepr.Services
         if (found.CreatorId == data.CreatorId)
         {
           update.Kept++;
-          _krepo.UpdateKept(update);
+          _krepo.UpdateCount(update);
           return _repo.Create(data);
         }
         //   throw new Exception("Not your Vault");
@@ -46,7 +46,7 @@ namespace keepr.Services
         throw new Exception("Invalid Vault");
       }
       update.Kept++;
-      _krepo.UpdateKept(update);
+      _krepo.UpdateCount(update);
       return _repo.Create(data);
     }
 
@@ -59,7 +59,7 @@ namespace keepr.Services
         throw new Exception("You cannot delete this");
       }
       update.Kept -= 1;
-      _krepo.UpdateKept(update);
+      _krepo.UpdateCount(update);
       _repo.Delete(id);
     }
   }

@@ -2,8 +2,17 @@
   <div class="container-fluid bg-secondary">
     <div class="masonry-with-columns">
       <div class="p-2" v-for="k in keeps" :key="k.id">
-        <div class="card bg-secondary text-white">
-          <img class="img-fluid rounded" :src="k.img" alt="" />
+        <div
+          class="card bg-secondary text-white selectable elevation-2"
+          data-bs-toggle="modal"
+          data-bs-target="#active-keep"
+          @click="setActive(k.id)"
+        >
+          <img
+            class="img-fluid rounded"
+            :src="k.img"
+            :alt="k.name + ' picture'"
+          />
           <div
             class="
               card-img-overlay
@@ -18,8 +27,7 @@
           >
             <h5 class="card-title t-shadow">{{ k.name }}</h5>
             <img
-              @click="goToProfile(k.creator.id)"
-              class="rounded-circle selectable"
+              class="rounded-circle"
               :src="k.creator.picture"
               height="40"
               width="40"
@@ -30,6 +38,7 @@
       </div>
     </div>
   </div>
+  <KeepDetailsModal />
 </template>
 
 <script>
@@ -38,26 +47,37 @@ import Pop from "../utils/Pop"
 import { keepsService } from "../services/KeepsService"
 import { computed } from "@vue/reactivity"
 import { AppState } from "../AppState"
-import { onMounted } from "@vue/runtime-core"
-import { router } from "../router"
+import { onMounted, watch, watchEffect } from "@vue/runtime-core"
 import { useRoute, useRouter } from "vue-router"
+import { accountService } from "../services/AccountService"
 export default {
   name: 'Home',
   setup() {
+    const route = useRoute()
     const router = useRouter()
-    onMounted(async () => {
+    watchEffect(async () => {
       try {
         await keepsService.getAll()
+        // await accountService.getAccount()
       } catch (error) {
         logger.log(error)
-        Pop.toast(error.message, 'error')
+        // Pop.toast(error.message, 'error')
       }
     })
     return {
+      account: computed(() => AppState.account),
+      user: computed(() => AppState.user),
       keeps: computed(() => AppState.keeps),
-      goToProfile(id) {
-        router.push({ name: 'Profile', params: { id } })
-      },
+      async setActive(id) {
+        try {
+          // await accountService.getAccount()
+          await accountService.getMyVaults()
+          await keepsService.getById(id)
+        } catch (error) {
+          logger.error(error)
+          Pop.toast(error.message, 'error')
+        }
+      }
     }
   }
 }

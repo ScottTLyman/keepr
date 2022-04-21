@@ -30,6 +30,7 @@ namespace keepr.Services
     {
       Keep keep = _repo.GetById(id);
       keep.Views++;
+      _repo.UpdateCount(keep);
       return keep;
     }
 
@@ -44,12 +45,13 @@ namespace keepr.Services
       _repo.Update(original);
       return original;
     }
-    private Keep UpdateKept(Keep data)
+    private Keep UpdateCount(Keep data)
     {
       Keep original = GetById(data.Id);
       ValidateOwner(data.CreatorId, original);
+      original.Views = data.Views;
       original.Kept = data.Kept;
-      _repo.Update(original);
+      _repo.UpdateCount(original);
       return original;
 
     }

@@ -7,11 +7,22 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { AppState } from '../AppState'
+import { accountService } from "../services/AccountService"
+import { useRoute } from "vue-router"
 export default {
   name: 'Account',
   setup() {
+    const route = useRoute()
+    onMounted(async () => {
+      try {
+        accountService.getMyVaults(route.params.id)
+      } catch (error) {
+        logger.error(error)
+        Pop.toast(error.message, 'error')
+      }
+    })
     return {
       account: computed(() => AppState.account)
     }
