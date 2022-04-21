@@ -126,12 +126,17 @@ export default {
   setup() {
     const route = useRoute()
     const router = useRouter()
-    onMounted(async () => {
+    watchEffect(async () => {
       try {
-        await profilesService.getProfileVaults(route.params.id)
-        await profilesService.getProfile(route.params.id)
-        await profilesService.getProfileKeeps(route.params.id)
-        await accountService.getMyVaults(route.params.id)
+        if (route.params.id) {
+          await profilesService.getProfile(route.params.id)
+          await profilesService.getProfileVaults(route.params.id)
+          await profilesService.getProfileKeeps(route.params.id)
+        }
+        if (route) {
+          await accountService.getMyVaults(route.params.id)
+        }
+
       } catch (error) {
         logger.error(error)
         Pop.toast(error.message, 'error')

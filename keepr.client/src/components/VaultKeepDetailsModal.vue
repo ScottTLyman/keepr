@@ -14,6 +14,7 @@
           <div class="col-md-6 p-2 d-flex flex-column justify-content-between">
             <div class="d-flex flex-column">
               <button
+                title="Close"
                 type="button"
                 class="btn-close align-self-end"
                 data-bs-dismiss="modal"
@@ -50,12 +51,6 @@
               <div
                 class="col-10 d-flex justify-content-between align-items-center"
               >
-                <!-- <button
-                  @click="deleteVaultKeep(keep.vaultKeepId)"
-                  class="btn btn-outline-secondary"
-                >
-                  Remove from Vault
-                </button> -->
                 <div
                   class="bg-secondary rounded selectable"
                   @click="goToProfile(keep.creator.id)"

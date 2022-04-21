@@ -33,6 +33,7 @@
             "
           >
             <i
+              title="Remove Keep from Vault"
               @click="deleteVaultKeep(k.vaultKeepId)"
               class="mdi mdi-trash-can-outline text-danger selectable"
             ></i>
@@ -76,8 +77,18 @@ export default {
     const route = useRoute()
     const router = useRouter()
     watchEffect(async () => {
-      await vaultsService.getById(route.params.id)
-      await vaultsService.getVaultKeeps(route.params.id)
+      try {
+        if (route.params.id) {
+
+          await vaultsService.getById(route.params.id)
+          await vaultsService.getVaultKeeps(route.params.id)
+        }
+
+      } catch (error) {
+        router.push({ name: 'Home' })
+        logger.error(error)
+        Pop.toast(error.message, 'error')
+      }
     })
     return {
       account: computed(() => AppState.account),
@@ -89,7 +100,7 @@ export default {
         try {
           if (await Pop.confirm("Delete your vault?")) {
             await vaultsService.deleteVault(route.params.id)
-            router.push({ name: 'Home' })
+            router.push({ name: 'Profile', params: { id: activeKeep.creatorId } })
           }
         } catch (error) {
           logger.error(error)

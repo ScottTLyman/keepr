@@ -14,6 +14,7 @@
           <div class="col-md-6 p-2 d-flex flex-column justify-content-between">
             <div class="d-flex flex-column">
               <button
+                title="Close"
                 type="button"
                 class="btn-close align-self-end"
                 data-bs-dismiss="modal"
@@ -55,8 +56,15 @@
                     {{ v.name }}
                   </option>
                 </select>
-                <button class="btn btn-success" @click="addVaultKeep">+</button>
+                <button
+                  title="Add to Vault"
+                  class="btn btn-success"
+                  @click="addVaultKeep"
+                >
+                  +
+                </button>
                 <i
+                  title="Delete Keep"
                   @click="deleteKeep(keep.id)"
                   v-if="account.id == keep.creator?.id"
                   class="mdi mdi-trash-can-outline text-danger fs-5 selectable"

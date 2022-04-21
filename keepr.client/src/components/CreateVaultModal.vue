@@ -4,6 +4,7 @@
       <form class="row d-flex" @submit.prevent="createVault">
         <div class="col-12 d-flex flex-column mb-2 form-group">
           <button
+            title="Close"
             type="button"
             class="btn-close align-self-end"
             data-bs-dismiss="modal"
