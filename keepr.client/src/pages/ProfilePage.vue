@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid bg-secondary screen-height">
     <div class="row">
-      <div class="col-10 d-flex align-items-center p-5">
+      <div class="col-10 d-flex align-items-center p-5 text-shrink">
         <img
           class="img-fluid rounded"
           height="300"
@@ -10,12 +10,12 @@
           alt=""
         />
         <div class="ps-3" v-if="user.id != profile.id">
-          <h1>{{ profile.name }}</h1>
+          <h1 class="">{{ profile.name }}</h1>
           <h4>Vaults: {{ vCount }}</h4>
           <h4>Keeps: {{ kCount }}</h4>
         </div>
         <div class="ps-3" v-else>
-          <h1>{{ profile.name }}</h1>
+          <h1 class="">{{ profile.name }}</h1>
           <h4>Vaults: {{ mCount }}</h4>
           <h4>Keeps: {{ kCount }}</h4>
         </div>
@@ -72,6 +72,13 @@
             @click="goToVault(v.id)"
           >
             <h5 class="card-title t-shadow">{{ v.name }}</h5>
+
+            <!-- <small class="text-warning"> EMPTY</small> -->
+            <i
+              class="mdi mdi-lock-outline text-warning"
+              v-show="v.isPrivate == true"
+              title="Private Vault"
+            ></i>
           </div>
         </div>
       </div>
@@ -88,10 +95,13 @@
       </h3>
     </div>
     <div class="masonry-with-columns">
-      <div v-for="k in pKeeps" :key="k.id">
-        <div class="card bg-secondary text-white elevation-2">
+      <div class="py-2" v-for="k in pKeeps" :key="k.id">
+        <div class="card bg-secondary text-white elevation-2 selectable">
           <img class="img-fluid rounded" :src="k.img" alt="" />
           <div
+            data-bs-toggle="modal"
+            data-bs-target="#active-keep"
+            @click="setActive(k.id)"
             class="
               card-img-overlay
               d-flex
@@ -111,6 +121,7 @@
   </div>
   <CreateVaultModal />
   <CreateKeepModal />
+  <KeepDetailsModal />
 </template>
 
 <script>
@@ -122,21 +133,18 @@ import Pop from "../utils/Pop"
 import { AppState } from "../AppState"
 import { accountService } from "../services/AccountService"
 import { router } from "../router"
+import { keepsService } from "../services/KeepsService"
+import { vaultKeepsService } from "../services/VaultKeepsService"
+import { vaultsService } from "../services/VaultsService"
 export default {
   setup() {
     const route = useRoute()
     const router = useRouter()
-    watchEffect(async () => {
+    onMounted(async () => {
       try {
-        if (route.params.id) {
-          await profilesService.getProfile(route.params.id)
-          await profilesService.getProfileVaults(route.params.id)
-          await profilesService.getProfileKeeps(route.params.id)
-        }
         if (route) {
-          await accountService.getMyVaults(route.params.id)
+          await profilesService.getProfile(route.params.id)
         }
-
       } catch (error) {
         logger.error(error)
         Pop.toast(error.message, 'error')
@@ -151,8 +159,17 @@ export default {
       mCount: computed(() => AppState.myVaults.length),
       kCount: computed(() => AppState.profileKeeps.length),
       vCount: computed(() => AppState.profileVaults.length),
+      vKeeps: computed(() => AppState.vaultKeeps),
       goToVault(id) {
         router.push({ name: 'Vault', params: { id } })
+      },
+      async setActive(id) {
+        try {
+          await keepsService.getById(id)
+        } catch (error) {
+          logger.error(error)
+          Pop.toast(error.message, 'error')
+        }
       },
     }
   }
@@ -162,7 +179,7 @@ export default {
 <style scoped lang="scss">
 .masonry-with-columns {
   columns: 6 200px;
-  column-gap: 1rem;
+  column-gap: 0.5rem;
   div {
     display: inline-flex;
     width: 100%;
@@ -185,5 +202,8 @@ export default {
 }
 .screen-height {
   height: 100%;
+}
+.text-shrink {
+  overflow: hidden;
 }
 </style>

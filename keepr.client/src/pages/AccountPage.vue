@@ -17,7 +17,7 @@ export default {
     const route = useRoute()
     onMounted(async () => {
       try {
-        accountService.getMyVaults(route.params.id)
+        await accountService.getMyVaults(route.params.id)
       } catch (error) {
         logger.error(error)
         Pop.toast(error.message, 'error')

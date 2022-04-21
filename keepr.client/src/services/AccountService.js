@@ -20,7 +20,7 @@ class AccountService {
       AppState.myVaults = res.data
     } catch (error) {
       logger.error(error)
-      Pop.toast(error.message, 'error')
+      // Pop.toast(error.message, 'error')
     }
   }
 }

@@ -62,6 +62,8 @@ import { logger } from "../utils/Logger"
 import Pop from "../utils/Pop"
 import { Modal } from "bootstrap"
 import { useRouter } from "vue-router"
+import { profilesService } from "../services/ProfilesService"
+import { AppState } from "../AppState"
 export default {
   setup() {
     const router = useRouter()
@@ -71,9 +73,10 @@ export default {
       async createVault() {
         try {
           let newVault = await vaultsService.createVault(vault.value)
+          await profilesService.getProfileVaults(AppState.account.id)
           Modal.getOrCreateInstance(document.getElementById("create-vault")).hide();
           vault.value = {}
-          router.push({ name: "Vault", params: { id: newVault.id } })
+          // router.push({ name: "Vault", params: { id: newVault.id } })
         } catch (error) {
           logger.error(error)
           Pop.toast(error.message, 'error')

@@ -33,12 +33,14 @@
             "
           >
             <i
+              v-if="vault.creator?.id == account.id"
               title="Remove Keep from Vault"
               @click="deleteVaultKeep(k.vaultKeepId)"
               class="mdi mdi-trash-can-outline text-danger selectable"
             ></i>
             <div class="d-flex align-self-end justify-content-between">
               <h5
+                title="See Details"
                 class="card-title t-shadow selectable"
                 @click="setActive(k.id)"
                 data-bs-toggle="modal"
@@ -47,8 +49,10 @@
                 {{ k.name }}
               </h5>
               <img
-                class="rounded-circle"
-                :src="k.creator.picture"
+                title="Go To Profile"
+                @click="goToProfile(k.creator?.id)"
+                class="rounded-circle selectable"
+                :src="k.creator?.picture"
                 height="40"
                 width="40"
                 alt=""
@@ -72,22 +76,19 @@ import { useRoute, useRouter } from "vue-router"
 import { logger } from "../utils/Logger"
 import Pop from "../utils/Pop"
 import { vaultKeepsService } from "../services/VaultKeepsService"
+import { Modal } from "bootstrap"
 export default {
   setup() {
     const route = useRoute()
     const router = useRouter()
-    watchEffect(async () => {
+    onMounted(async () => {
       try {
-        if (route.params.id) {
-
-          await vaultsService.getById(route.params.id)
-          await vaultsService.getVaultKeeps(route.params.id)
-        }
-
+        await vaultsService.getById(route.params.id)
+        await vaultsService.getVaultKeeps(route.params.id)
       } catch (error) {
         router.push({ name: 'Home' })
         logger.error(error)
-        Pop.toast(error.message, 'error')
+        // Pop.toast(error.message, 'error')
       }
     })
     return {
@@ -100,7 +101,7 @@ export default {
         try {
           if (await Pop.confirm("Delete your vault?")) {
             await vaultsService.deleteVault(route.params.id)
-            router.push({ name: 'Profile', params: { id: activeKeep.creatorId } })
+            router.push({ name: 'Profile', params: { id: this.vault.creatorId } })
           }
         } catch (error) {
           logger.error(error)
@@ -109,7 +110,6 @@ export default {
       },
       async setActive(id) {
         try {
-          // await vaultKeepsService.getById(id)
           await keepsService.getById(id)
         } catch (error) {
           logger.error(error)
@@ -120,11 +120,16 @@ export default {
         try {
           if (await Pop.confirm("Remove keep from Vault?")) {
             await vaultKeepsService.deleteVaultKeep(id)
+            await vaultsService.getVaultKeeps(AppState.activeVault.id)
           }
         } catch (error) {
           logger.error(error)
           Pop.toast(error.message, 'error')
         }
+      },
+      goToProfile(id) {
+        router.push({ name: 'Profile', params: { id } })
+        Modal.getOrCreateInstance(document.getElementById("active-keep")).hide();
       },
     }
   }

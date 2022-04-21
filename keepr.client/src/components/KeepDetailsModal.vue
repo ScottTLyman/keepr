@@ -5,7 +5,7 @@
         <div class="row">
           <div class="col-md-6 p-2 rounded">
             <img
-              class="w-100 object-fit-cover rounded"
+              class="w-100 detail-img rounded"
               height="500"
               :src="keep.img"
               alt=""
@@ -34,6 +34,17 @@
                   ></i
                   >{{ keep.kept }}
                   <h1 class="mt-2">{{ keep.name }}</h1>
+                  <i
+                    title="Delete Keep"
+                    @click="deleteKeep(keep.id)"
+                    v-if="account.id == keep.creator?.id"
+                    class="
+                      mdi mdi-trash-can-outline
+                      text-danger
+                      fs-5
+                      selectable
+                    "
+                  ></i>
                 </div>
                 <div class="row justify-content-center">
                   <div class="col-10">
@@ -45,32 +56,49 @@
               </div>
             </div>
             <div class="row justify-content-center">
-              <div class="col-10 border-bottom"></div>
+              <div class="col-12 col-md-10 border-bottom"></div>
             </div>
             <div class="row justify-content-center">
               <div
-                class="col-10 d-flex justify-content-between align-items-center"
+                class="
+                  col-12 col-md-10
+                  d-flex
+                  justify-content-between
+                  align-items-center
+                "
               >
-                <select v-model="vaultId">
-                  <option v-for="v in vaults" :key="v.id" :value="v.id">
-                    {{ v.name }}
-                  </option>
-                </select>
-                <button
-                  title="Add to Vault"
-                  class="btn btn-success"
-                  @click="addVaultKeep"
-                >
-                  +
-                </button>
-                <i
-                  title="Delete Keep"
-                  @click="deleteKeep(keep.id)"
-                  v-if="account.id == keep.creator?.id"
-                  class="mdi mdi-trash-can-outline text-danger fs-5 selectable"
-                ></i>
+                <!-- <p>Add to Vault</p> -->
+                <div class="d-flex">
+                  <select
+                    title="Select Vault"
+                    v-show="user.isAuthenticated"
+                    v-model="vaultId"
+                  >
+                    <option v-for="v in vaults" :key="v.id" :value="v.id">
+                      {{ v.name }}
+                    </option>
+                  </select>
+                  <button
+                    v-if="user.isAuthenticated"
+                    title="Add to Vault"
+                    class="btn btn-success p-0"
+                    @click="addVaultKeep"
+                  >
+                    +
+                  </button>
+                </div>
+
                 <div
-                  class="bg-secondary rounded selectable"
+                  title="Go To Profile"
+                  class="
+                    order-sm-0
+                    d-flex
+                    align-items-center
+                    bg-secondary
+                    rounded
+                    selectable
+                    align-self-end
+                  "
                   @click="goToProfile(keep.creator.id)"
                 >
                   <img
@@ -105,6 +133,7 @@ import { router } from "../router"
 import { useRouter } from "vue-router"
 import Pop from "../utils/Pop"
 import { keepsService } from "../services/KeepsService"
+import { profilesService } from "../services/ProfilesService"
 export default {
   setup() {
 
@@ -135,6 +164,7 @@ export default {
       async deleteKeep(id) {
         if (await Pop.confirm('Delete this Keep?')) {
           await keepsService.deleteKeep(id)
+          await profilesService.getProfileKeeps(AppState.account.id)
           Modal.getOrCreateInstance(document.getElementById('active-keep')).hide();
         }
 
@@ -149,5 +179,8 @@ export default {
 .menu-scroll {
   overflow: scroll;
   height: 200px;
+}
+.detail-img {
+  object-fit: cover;
 }
 </style>

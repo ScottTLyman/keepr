@@ -5,7 +5,7 @@
         <div class="row">
           <div class="col-md-6 p-2 rounded">
             <img
-              class="w-100 object-fit-cover rounded"
+              class="w-100 detail-img rounded"
               height="500"
               :src="keep?.img"
               alt=""
@@ -81,14 +81,17 @@ import { AppState } from "../AppState"
 import { logger } from "../utils/Logger"
 import Pop from "../utils/Pop"
 import { vaultKeepsService } from "../services/VaultKeepsService"
+import { useRouter } from "vue-router"
+import { Modal } from "bootstrap"
 export default {
-  props: {
-    vaultKeep: {
-      type: Object,
-      required: true
-    }
-  },
-  setup(props) {
+  // props: {
+  //   vaultKeep: {
+  //     type: Object,
+  //     required: true
+  //   }
+  // },
+  setup() {
+    const router = useRouter()
     return {
       vaultKeeps: computed(() => AppState.vaultKeeps),
       keep: computed(() => AppState.activeKeep),
@@ -103,4 +106,7 @@ export default {
 
 
 <style lang="scss" scoped>
+.detail-img {
+  object-fit: cover;
+}
 </style>

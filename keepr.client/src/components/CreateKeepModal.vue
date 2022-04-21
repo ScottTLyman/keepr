@@ -59,6 +59,8 @@ import { logger } from "../utils/Logger"
 import Pop from "../utils/Pop"
 import { Modal } from "bootstrap"
 import { keepsService } from "../services/KeepsService"
+import { profilesService } from "../services/ProfilesService"
+import { AppState } from "../AppState"
 export default {
   setup() {
     const router = useRouter()
@@ -68,6 +70,7 @@ export default {
       async createKeep() {
         try {
           await keepsService.createKeep(keep.value)
+          await profilesService.getProfileKeeps(AppState.account.id)
           Modal.getOrCreateInstance(document.getElementById("create-vault")).hide();
           keep.value = {}
         } catch (error) {

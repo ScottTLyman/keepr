@@ -50,6 +50,7 @@ import { AppState } from "../AppState"
 import { onMounted, watch, watchEffect } from "@vue/runtime-core"
 import { useRoute, useRouter } from "vue-router"
 import { accountService } from "../services/AccountService"
+import { Modal } from "bootstrap"
 export default {
   name: 'Home',
   setup() {
@@ -58,10 +59,9 @@ export default {
     watchEffect(async () => {
       try {
         await keepsService.getAll()
-        // await accountService.getAccount()
       } catch (error) {
         logger.log(error)
-        // Pop.toast(error.message, 'error')
+        Pop.toast(error.message, 'error')
       }
     })
     return {
@@ -70,14 +70,16 @@ export default {
       keeps: computed(() => AppState.keeps),
       async setActive(id) {
         try {
-          // await accountService.getAccount()
-          await accountService.getMyVaults()
           await keepsService.getById(id)
         } catch (error) {
           logger.error(error)
           Pop.toast(error.message, 'error')
         }
-      }
+      },
+      goToProfile(id) {
+        router.push({ name: 'Profile', params: { id } })
+        Modal.getOrCreateInstance(document.getElementById("active-keep")).hide();
+      },
     }
   }
 }
